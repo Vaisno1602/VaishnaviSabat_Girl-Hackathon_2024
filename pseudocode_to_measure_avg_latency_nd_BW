@@ -1,0 +1,28 @@
+# Pseudocode
+# Initialize variables
+total_latency = 0
+total_bytes_transferred = 0
+total_transactions = 0
+
+# Process interface monitor output efficiently
+for line in interface_monitor_output:
+    timestamp, txn_type, data = line.split()
+    
+    if txn_type == "Rd":
+        # Find corresponding data transaction and calculate latency
+        corresponding_data_transaction = next(
+            (next_line for next_line in interface_monitor_output if
+             next_line.startswith("Data") and next_line.split()[2] == data), None
+        )
+        if corresponding_data_transaction:
+            total_latency += int(corresponding_data_transaction.split()[0]) - int(timestamp)
+    
+    elif txn_type == "Wr":
+        # Calculate bytes transferred for write transactions
+        total_bytes_transferred += len(data)
+    
+    total_transactions += 1
+
+# Calculate average latency and bandwidth
+average_latency = total_latency / total_transactions
+average_bandwidth = total_bytes_transferred / total_transactions
